@@ -10,8 +10,12 @@
 .idea/
 *.iml
 
-# VS Code (optional local settings)
-.vscode/
+# VS Code (共有する設定ファイルだけコミットする)
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
 
 # OS files
 .DS_Store

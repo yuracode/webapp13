@@ -11,6 +11,9 @@ import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.List;
+
+import dao.EmployeeDAO;
+import dao.MutterDAO;
 import model.Mutter;
 import model.User;
 import model.PostMutterLogic;
@@ -20,12 +23,12 @@ public class Main extends HttpServlet {
     private static final long serialVersionUID = 1L;
     protected void doGet(HttpServletRequest request, HttpServletResponse response) 
     throws ServletException, IOException {
-        ServletContext application = getServletContext();
-        List<Mutter> mutterList = (List<Mutter>) application.getAttribute("mutterList");
+        MutterDAO mutterDAO = new MutterDAO();
+        List<Mutter> mutterList = mutterDAO.findAll();
         if(mutterList == null) {
             mutterList = new ArrayList<>();
-            application.setAttribute("mutterList", mutterList);
         }
+        request.setAttribute("mutterList", mutterList);
         HttpSession session = request.getSession();
         User loginUser = (User) session.getAttribute("loginUser");
         if(loginUser == null) {
@@ -40,15 +43,15 @@ public class Main extends HttpServlet {
         // Handle POST requests
         String text = request.getParameter("text");
         if(text != null && text.length() != 0) {
-            ServletContext application = getServletContext();
-            List<Mutter> mutterList = (List<Mutter>) application.getAttribute("mutterList");
             HttpSession session = request.getSession();
             User loginUser = (User) session.getAttribute("loginUser");
 
             Mutter mutter = new Mutter(loginUser.getName(), text);
             PostMutterLogic postMutterLogic = new PostMutterLogic();
-            postMutterLogic.execute(mutter, mutterList);
-            application.setAttribute("mutterList", mutterList);
+            postMutterLogic.execute(mutter);
+            MutterDAO mutterDAO = new MutterDAO();
+            List<Mutter> mutterList = mutterDAO.findAll();
+            request.setAttribute("mutterList", mutterList);
         } else {
             request.setAttribute("errorMsg", "つぶやきが入力されていません");
         }
